@@ -1,0 +1,21 @@
+
+https://www.youtube.com/watch?v=-v1vz_NcWng&list=PLjpijTpXl1_po-ld8jORR9k5NornDNKQk
+
+# get fine
+go install fyne.io/fyne@latest
+#get find packager
+go install fyne.io/fyne/v2/cmd/fyne@latest
+
+#New project
+go mod init xample.com/fyex1
+go get fyne.io/fyne/v2
+go mod tidy
+
+
+#package
+fyne package -icon ./icon.ico
+
+#demo project
+go install fyne.io/fyne/v2/cmd/fyne_demo@latest
+go get fyne.io/fyne/v2/cmd/fyne_demo
+fyne_demo
