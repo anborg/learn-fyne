@@ -27,22 +27,23 @@ func main() {
 			a.Preferences().SetString("AppTimeout", selected)
 		},
 	) //timeoutselcector
-	timeoutSelector.SetSelected(a.Preferences().StringWithFallback("AppTimeout", "10"))
+	timeoutSelector.SetSelected(a.Preferences().StringWithFallback("AppTimeout", "30"))
 
 	w := a.NewWindow("Timeout")
 	clock := widget.NewLabel("Time")
 	updateTime(clock)
 
+	var mycontainer *fyne.Container
 	//Destop or mobile
+	var mywidgetMap map[string]interface{} = makeUI()
+	mywidgetMap["timeoutSelector"] = timeoutSelector
+	mywidgetMap["clock"] = clock
 	if a.Driver().Device().IsMobile() {
-		mycontainer := phoneLayout(makeUI())
-		mycontainer.Add(timeoutSelector)
-		mycontainer.Add(clock)
-		w.SetContent(mycontainer)
+		mycontainer = phoneLayout(mywidgetMap)
 	} else {
-
-		w.SetContent(desktopLayout(makeUI()))
+		mycontainer = desktopLayout(mywidgetMap)
 	}
+	w.SetContent(mycontainer)
 
 	w.SetMaster() // make one window as master
 
@@ -78,28 +79,32 @@ func main() {
 	tidyUp()
 }
 
-func phoneLayout(widgetMap map[string]fyne.CanvasObject) *fyne.Container {
+func phoneLayout(widgetMap map[string]interface{}) *fyne.Container {
 	return container.NewVBox(
-		widgetMap["username"],
-		widgetMap["password"],
-		widgetMap["button"],
+		widgetMap["username"].(*widget.Entry),
+		widgetMap["password"].(*widget.Entry),
+		widgetMap["button"].(fyne.CanvasObject),
 		layout.NewSpacer(),
-		widgetMap["greeting"],
+		widgetMap["greeting"].(fyne.CanvasObject),
+		widgetMap["timeoutSelector"].(fyne.CanvasObject),
+		widgetMap["clock"].(fyne.CanvasObject),
 	)
 }
 
 //username *widget.Entry, password *widget.Entry, greeting *widget.Label, button *widget.Button
-func desktopLayout(widgetMap map[string]fyne.CanvasObject) *fyne.Container {
+func desktopLayout(widgetMap map[string]interface{}) *fyne.Container {
 	return container.NewGridWithRows(3,
 		layout.NewSpacer(),
 		container.NewGridWithColumns(3, //second row spint into 3 col
 			layout.NewSpacer(),
 			container.NewVBox(
-				widgetMap["username"],
-				widgetMap["password"],
-				widgetMap["button"],
+				widgetMap["username"].(*widget.Entry), //how can I avoid casting
+				widgetMap["password"].(*widget.Entry),
+				widgetMap["button"].(fyne.CanvasObject),
 				layout.NewSpacer(),
-				widgetMap["greeting"],
+				widgetMap["greeting"].(fyne.CanvasObject),
+				widgetMap["timeoutSelector"].(fyne.CanvasObject),
+				widgetMap["clock"].(fyne.CanvasObject),
 			),
 		),
 		layout.NewSpacer(),
@@ -107,10 +112,10 @@ func desktopLayout(widgetMap map[string]fyne.CanvasObject) *fyne.Container {
 }
 
 //sername *widget.Entry, password *widget.Entry, greeting *widget.Label, button *widget.Button,
-func makeUI() (widgetMap map[string]fyne.CanvasObject) {
+func makeUI() (widgetMap map[string]interface{}) {
 
-	username := widget.Entry{PlaceHolder: "Username"}
-	password := widget.Entry{PlaceHolder: "Password", Password: true}
+	username := &widget.Entry{PlaceHolder: "Username"}
+	password := &widget.Entry{PlaceHolder: "Password", Password: true}
 	greeting := widget.NewLabel("")
 	button := &widget.Button{Text: "Login", Icon: theme.ConfirmIcon()}
 
@@ -118,7 +123,7 @@ func makeUI() (widgetMap map[string]fyne.CanvasObject) {
 		greeting.SetText("Greeting: Hello " + content + "!")
 	}
 
-	widgetMap = map[string]fyne.CanvasObject{
+	widgetMap = map[string]interface{}{
 		"username": username,
 		"password": password,
 		"greeting": greeting,
