@@ -78,17 +78,18 @@ func main() {
 	tidyUp()
 }
 
-func desktopLayout(username *widget.Entry, password *widget.Entry, greeting *widget.Label, button *widget.Button) *fyne.Container {
+//username *widget.Entry, password *widget.Entry, greeting *widget.Label, button *widget.Button
+func desktopLayout(widgetMap map[string]any) *fyne.Container {
 	return container.NewGridWithRows(3,
 		layout.NewSpacer(),
 		container.NewGridWithColumns(3, //second row spint into 3 col
 			layout.NewSpacer(),
 			container.NewVBox(
-				username,
-				password,
-				button,
+				widgetMap["username"],
+				widgetMap["password"],
+				widgetMap["button"],
 				layout.NewSpacer(),
-				greeting,
+				widgetMap["greeting"],
 			),
 		),
 		layout.NewSpacer(),
@@ -96,10 +97,10 @@ func desktopLayout(username *widget.Entry, password *widget.Entry, greeting *wid
 }
 
 //sername *widget.Entry, password *widget.Entry, greeting *widget.Label, button *widget.Button,
-func makeUI() (widgetMap map[string]*any) {
+func makeUI() (widgetMap map[string]fyne.CanvasObject) {
 
-	username := &widget.Entry{PlaceHolder: "Username"}
-	password := &widget.Entry{PlaceHolder: "Password", Password: true}
+	username := widget.Entry{PlaceHolder: "Username"}
+	password := widget.Entry{PlaceHolder: "Password", Password: true}
 	greeting := widget.NewLabel("")
 	button := &widget.Button{Text: "Login", Icon: theme.ConfirmIcon()}
 
@@ -107,7 +108,7 @@ func makeUI() (widgetMap map[string]*any) {
 		greeting.SetText("Greeting: Hello " + content + "!")
 	}
 
-	widgetMap = map[string]any{
+	widgetMap = map[string]fyne.CanvasObject{
 		"username": username,
 		"password": password,
 		"greeting": greeting,
