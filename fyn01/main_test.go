@@ -4,10 +4,13 @@ import (
 	"testing"
 
 	"fyne.io/fyne/v2/test"
+	"fyne.io/fyne/v2/widget"
 )
 
 func TestGreeting(t *testing.T) {
-	username, _, greeting, _ := makeUI()
+	widgetMap := makeUI()
+	username := widgetMap["username"].(*widget.Entry)
+	greeting := widgetMap["greeting"].(*widget.Label)
 	if greeting.Text != "" {
 		t.Error("Incorrect initial greeting")
 	}
