@@ -1,0 +1,8 @@
+Website = "https://example.com"
+
+[Details]
+Icon = "Icon.png"
+Name = "My App01"
+ID = "com.example.app01"
+Version = "1.0.0"
+Build = 1

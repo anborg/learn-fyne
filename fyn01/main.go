@@ -2,28 +2,49 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
 func main() {
-	a := app.New()
-	w := a.NewWindow("Clock")
+
+	a := app.NewWithID("com.example.tutorial.preferences")
+	a.Preferences().SetBool("Boolean", true)
+
+	//to demo preferences
+	var timeout time.Duration
+	timeoutSelector := widget.NewSelect([]string{"10", "20", "30", "120"},
+		func(selected string) {
+			i, _ := strconv.Atoi(selected)
+			timeout = time.Duration(i) * time.Second
+			a.Preferences().SetString("AppTimeout", selected)
+		},
+	) //timeoutselcector
+	timeoutSelector.SetSelected(a.Preferences().StringWithFallback("AppTimeout", "10"))
+
+	w := a.NewWindow("Timeout")
 	clock := widget.NewLabel("Time")
 	updateTime(clock)
-	w.SetContent(container.NewVBox(
-		makeUI()))
-	w.SetMaster()
-	//To uodate time constantly, create a goroutine
-	go func() { //Place this code before  Run()
-		for range time.Tick(time.Second) {
-			updateTime(clock)
-		}
-	}()
+
+	//Destop or mobile
+	if a.Driver().Device().IsMobile() {
+		mycontainer := container.NewVBox(makeUI())
+		mycontainer.Add(timeoutSelector)
+		mycontainer.Add(clock)
+		w.SetContent(mycontainer)
+	} else {
+
+		w.SetContent(desktopLayout(makeUI()))
+	}
+
+	w.SetMaster() // make one window as master
 
 	w.Show()
 	w2 := a.NewWindow("target")
@@ -35,17 +56,62 @@ func main() {
 	w2.Resize(fyne.NewSize(100, 100))
 	w2.Show()
 
-	//make one window master
+	//Backgroud processes
+	//Use goroutines for background tasks
+	go func() { //Place this code before  Run()
+		//Update time
+		for range time.Tick(time.Second) {
+			updateTime(clock)
+		}
+
+	}()
+
+	go func() {
+		//Quit application based on preference timeset
+		fmt.Println("Time to sleep", timeout.String())
+		time.Sleep(timeout)
+		fmt.Println("Time to close the app?!")
+		a.Quit()
+	}()
 
 	a.Run() //Event-loop, or Run-loop
 	tidyUp()
 }
-func makeUI() (in *widget.Entry, out *widget.Label) {
-	in = widget.NewEntry()
-	out = widget.NewLabel("")
 
-	in.OnChanged = func(content string) {
-		out.SetText("Greeting: Hello " + content + "!")
+func desktopLayout(username *widget.Entry, password *widget.Entry, greeting *widget.Label, button *widget.Button) *fyne.Container {
+	return container.NewGridWithRows(3,
+		layout.NewSpacer(),
+		container.NewGridWithColumns(3, //second row spint into 3 col
+			layout.NewSpacer(),
+			container.NewVBox(
+				username,
+				password,
+				button,
+				layout.NewSpacer(),
+				greeting,
+			),
+		),
+		layout.NewSpacer(),
+	)
+}
+
+//sername *widget.Entry, password *widget.Entry, greeting *widget.Label, button *widget.Button,
+func makeUI() (widgetMap map[string]*any) {
+
+	username := &widget.Entry{PlaceHolder: "Username"}
+	password := &widget.Entry{PlaceHolder: "Password", Password: true}
+	greeting := widget.NewLabel("")
+	button := &widget.Button{Text: "Login", Icon: theme.ConfirmIcon()}
+
+	username.OnChanged = func(content string) {
+		greeting.SetText("Greeting: Hello " + content + "!")
+	}
+
+	widgetMap = map[string]any{
+		"username": username,
+		"password": password,
+		"greeting": greeting,
+		"button":   button,
 	}
 	return
 }

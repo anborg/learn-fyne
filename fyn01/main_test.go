@@ -7,14 +7,14 @@ import (
 )
 
 func TestGreeting(t *testing.T) {
-	in, out := makeUI()
-	if out.Text != "" {
+	username, _, greeting, _ := makeUI()
+	if greeting.Text != "" {
 		t.Error("Incorrect initial greeting")
 	}
 
 	//mock user input
-	test.Type(in, "Andy")
-	if out.Text != "Greeting: Hello Andy!" {
+	test.Type(username, "Andy")
+	if greeting.Text != "Greeting: Hello Andy!" {
 		t.Error("Incorrect user greeting")
 	}
 

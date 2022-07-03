@@ -5,6 +5,15 @@ https://www.youtube.com/watch?v=-v1vz_NcWng&list=PLjpijTpXl1_po-ld8jORR9k5NornDN
 go install fyne.io/fyne@latest
 #get find packager
 go install fyne.io/fyne/v2/cmd/fyne@latest
+go install fyne.io/fyne/v2/cmd/fyne_settings
+go install github.com/fyne-io/apps
+
+go get fyne.io/fynedesk/cmd/fynedesk
+go install fyne.io/fynedesk/cmd/fynedesk
+fynedesk
+go get fyne.io/fynedesk/cmd/fynedesk_runner
+go install fyne.io/fynedesk/cmd/fynedesk_runner
+fynedesk_runner
 
 #New project
 go mod init xample.com/fyex1
@@ -13,9 +22,15 @@ go mod tidy
 
 
 #package
-fyne package -icon ./icon.ico
+fyne package -os darwin -icon icon.png
+fyne install
 
 #demo project
 go install fyne.io/fyne/v2/cmd/fyne_demo@latest
 go get fyne.io/fyne/v2/cmd/fyne_demo
 fyne_demo
+
+
+# For iOS
+go install github.com/fyne-io/fyne-cross
+fyne-cross ios
