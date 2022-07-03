@@ -35,7 +35,7 @@ func main() {
 
 	//Destop or mobile
 	if a.Driver().Device().IsMobile() {
-		mycontainer := container.NewVBox(makeUI())
+		mycontainer := phoneLayout(makeUI())
 		mycontainer.Add(timeoutSelector)
 		mycontainer.Add(clock)
 		w.SetContent(mycontainer)
@@ -78,8 +78,18 @@ func main() {
 	tidyUp()
 }
 
+func phoneLayout(widgetMap map[string]fyne.CanvasObject) *fyne.Container {
+	return container.NewVBox(
+		widgetMap["username"],
+		widgetMap["password"],
+		widgetMap["button"],
+		layout.NewSpacer(),
+		widgetMap["greeting"],
+	)
+}
+
 //username *widget.Entry, password *widget.Entry, greeting *widget.Label, button *widget.Button
-func desktopLayout(widgetMap map[string]any) *fyne.Container {
+func desktopLayout(widgetMap map[string]fyne.CanvasObject) *fyne.Container {
 	return container.NewGridWithRows(3,
 		layout.NewSpacer(),
 		container.NewGridWithColumns(3, //second row spint into 3 col
